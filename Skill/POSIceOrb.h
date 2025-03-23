@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "POSAttackSkillBase.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "POSIceOrb.generated.h"
 
 /**
@@ -19,6 +19,9 @@ class PLEDGEOFSTARLIGHT_API APOSIceOrb : public APOSAttackSkillBase
 public:
 	APOSIceOrb();
 
+	UPROPERTY(Category = "POS_Physics", VisibleAnywhere)
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+
 private:
 	UPROPERTY(Category = "POS_Effect", VisibleAnywhere)
 	TObjectPtr<UNiagaraComponent> IceOrbNiagaraComponent;
@@ -26,13 +29,17 @@ private:
 	UPROPERTY(Category = "POS_Collision", VisibleAnywhere)
 	TObjectPtr<USphereComponent> AttackCollision;
 
-	UPROPERTY(Category = "POS_Physics", VisibleAnywhere)
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+	UPROPERTY(Category = "POS_Physics", EditDefaultsOnly)
+	float HomingAccelerationMagnitude = 3000;
 
-	FTimerHandle TimerHandle;
+	UPROPERTY(Category = "POS_Physics", VisibleAnywhere)
+	FVector HomingVelocity = FVector(1, 400, 400);
+
+	FTimerHandle StartTimerHandle;
+	FTimerHandle DestroyTimerHandle;
 
 	UPROPERTY(Category = "POS_Parameter", EditAnywhere)
-	float ChasingDelay = 1.0f;
+	float ChasingDelay = 0.1f;
 	
 	UPROPERTY(Category = "POS_Parameter", EditAnywhere)
 	float LifeTime = 2.0f;

@@ -5,28 +5,37 @@
 
 #include "NiagaraComponent.h"
 #include "Components/SphereComponent.h"
+#include "PledgeOfStarlight/Interface/POSEnemyInterface.h"
 
 APOSIceOrb::APOSIceOrb()
 {
-	IceOrbNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("IceOrbNiagaraComponent"));
-	RootComponent = IceOrbNiagaraComponent;
-
+	PrimaryActorTick.bCanEverTick = true;
+	
 	AttackCollision = CreateDefaultSubobject<USphereComponent>(TEXT("AttackCollision"));
-	AttackCollision->SetupAttachment(IceOrbNiagaraComponent);
+	RootComponent = AttackCollision;
+	RootComponent->SetMobility(EComponentMobility::Movable);
+	
+	IceOrbNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("IceOrbNiagaraComponent"));
+	IceOrbNiagaraComponent->SetupAttachment(AttackCollision);
+	IceOrbNiagaraComponent->SetMobility(EComponentMobility::Movable);
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));		
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->SetUpdatedComponent(RootComponent);
 }
 
 void APOSIceOrb::BeginPlay()
 {
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APOSIceOrb::StartChasing, ChasingDelay, false);
+	Super::BeginPlay();
+	AttackCollision->OnComponentBeginOverlap.AddDynamic(this, &APOSIceOrb::OnAttackCollisionOverlap);
+	GetWorld()->GetTimerManager().SetTimer(StartTimerHandle, this, &APOSIceOrb::StartChasing, ChasingDelay, false);
 }
 
 void APOSIceOrb::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (GetWorld())
 	{
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(StartTimerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
 	}
 	
 	Super::EndPlay(EndPlayReason);
@@ -36,19 +45,27 @@ void APOSIceOrb::StartChasing()
 {
 	ProjectileMovementComponent->Velocity = FVector3d(0, 0, 0);
 	ProjectileMovementComponent->bIsHomingProjectile = true;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APOSIceOrb::DestroyIceOrbActor, LifeTime, false);
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &APOSIceOrb::DestroyIceOrbActor, LifeTime, false);
 }
 
 void APOSIceOrb::DestroyIceOrbActor()
 {
-	Destroy();
+	Super::Destroy();
+	if (IsValid(this))
+	{
+		this->ConditionalBeginDestroy();
+	}
 }
 
 void APOSIceOrb::OnAttackCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	HitEvent(OtherActor, SkillData.Damage, 0, GetActorLocation());
-	AttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetWorldTimerManager().SetTimerForNextTick(this, &APOSIceOrb::DestroyIceOrbActor);
+	IPOSEnemyInterface* POSEnemyInterface = Cast<IPOSEnemyInterface>(OtherActor);
+	if(POSEnemyInterface)
+	{
+		HitEvent(OtherActor, SkillData.Damage, 0, GetActorLocation());
+		AttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APOSIceOrb::DestroyIceOrbActor);	
+	}
 	return;
 }

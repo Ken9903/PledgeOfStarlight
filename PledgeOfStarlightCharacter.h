@@ -8,6 +8,8 @@
 #include "Logging/LogMacros.h"
 #include "Player/POSPlayerAbility.h"
 #include "Player/POSPlayerInventory.h"
+#include "Components/SphereComponent.h"
+#include "Interface/POSGimmickInteractInterface.h"
 #include "PledgeOfStarlightCharacter.generated.h"
 
 class USpringArmComponent;
@@ -23,6 +25,11 @@ class APledgeOfStarlightCharacter : public ACharacter, public IPOSPlayerInterfac
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(Category = "POS_Gimmick", EditDefaultsOnly)
+	TArray<IPOSGimmickInteractInterface*> GimmickInteractObjectList;
+
+private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -31,11 +38,15 @@ class APledgeOfStarlightCharacter : public ACharacter, public IPOSPlayerInterfac
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 
+	//Custom Player Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = POS_Ability, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPOSPlayerAbility> PlayerAbility;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = POS_Inventory, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPOSPlayerInventory> PlayerInventory;
+
+	UPROPERTY(Category = "POS_Collision", EditDefaultsOnly)
+	TObjectPtr<USphereComponent> SkillGimmickTrigger;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -67,7 +78,16 @@ public:
 	UFUNCTION(Category = "POS_Player")
 	virtual UPOSPlayerInventory* GetPlayerInventory() override;
 
+	//Dialogue
+	UFUNCTION(Category = "POS_Player")
+	virtual UPOSNPCDialogueHighlightWidget* GetNPCDialogueHighlightWidget() override;
+	UFUNCTION(Category = "POS_Player")
+	virtual void SetNPCDialogueHighlightWidget(UPOSNPCDialogueHighlightWidget* InNPCDialogueHighlightWidget) override;
+
 protected:
+	//Dialogue
+	UPROPERTY(Category = "POS_Scenario", EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UPOSNPCDialogueHighlightWidget> NPCDialogueHighlightWidget = nullptr; //기본 nullptr상태, Dialogue Trigger시 할당.
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -98,6 +118,15 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+private:
+	UFUNCTION(Category = "POS_Gimmick")
+	void OnSkillGimmickCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION(Category = "POS_Gimmick")
+	void OnSkillGimmickCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 };
 

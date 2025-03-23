@@ -27,14 +27,31 @@ public:
 	virtual FUtilitySkillData GetUtilitySkillDataFromTable(FName RowName) override;
 
 	UFUNCTION(Category = "POS_Skill")
-	virtual TArray<FSkillMasterInfo> GetEarnedSkillDataList() override;
+	virtual TMap<FName, FSkillMasterInfo> GetEarnedSkillDataList() override;
 
 	UFUNCTION(Category = "POS_Skill", BlueprintCallable)
-	void AddEarnSkillData(FSkillMasterInfo SkillData);
+	void AppendSkillEarnReadyData(FName SkillID);
+
+	UFUNCTION(Category = "POS_Skill", BlueprintCallable)
+	void AddEarnSkillData(FName SkillID, FSkillMasterInfo SkillData);
+
+	UFUNCTION(Category = "POS_Skill", BlueprintCallable)
+	void EarnSkillData(FName SkillID);
+
+	UFUNCTION(Category = "POS_Skill", BlueprintCallable)
+	void AddLevelProgressStatus(FName SkillID, float Amount);
+
+	UFUNCTION(Category = "POS_Skill", BlueprintCallable)
+	void AddSkillEarnProgressStatus(FName SkillID, float Amount);
 
 private:
-	UPROPERTY(Category = "POS_Skill", VisibleAnywhere)
-	TArray<FSkillMasterInfo> EarnedSkillDataList;
+	UPROPERTY(Category = "POS_Skill", VisibleAnywhere) //Save
+	TMap<FName, FSkillMasterInfo> EarnedSkillDataList; //FName : 외부 특정 스킬 요소 접근용
+
+	UPROPERTY(Category = "POS_Skill", VisibleAnywhere) //Save
+	TMap<FName, float> SkillEarnReadyStatus;
+
+	
 	
 	UPROPERTY(Category = "POS_Skill", VisibleAnywhere)
 	TObjectPtr<UDataTable> SkillDataTable;

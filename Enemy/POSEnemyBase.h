@@ -19,6 +19,8 @@ public:
 
 	virtual void TakeDamage(float Damage, float SoundDelay) override;
 
+	virtual USceneComponent* GetHitPoint() override;
+
 private:
 	UPROPERTY(Category = "POS_Enemy", VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;

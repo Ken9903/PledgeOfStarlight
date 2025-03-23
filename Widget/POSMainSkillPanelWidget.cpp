@@ -12,7 +12,7 @@
 void UPOSMainSkillPanelWidget::SetUpSkillUI()
 {
 	IPOSSkillSubSystemInterface* POSSkillSubSystemInterface = Cast<IPOSSkillSubSystemInterface>(GetGameInstance()->GetSubsystem<UPOSSkillGameInstanceSubSystem>());
-	TArray<FSkillMasterInfo> EarnedSkillData = POSSkillSubSystemInterface->GetEarnedSkillDataList();
+	TMap<FName, FSkillMasterInfo> EarnedSkillData = POSSkillSubSystemInterface->GetEarnedSkillDataList();
 
 	for (auto Data : EarnedSkillData)
 	{
@@ -35,7 +35,7 @@ void UPOSMainSkillPanelWidget::SetUpSkillUI()
 		if(SlotData)
 		{
 			SlotData->SlotType = ESlotType::Skill;
-			SlotData->SkillMasterInfo = Data;
+			SlotData->SkillMasterInfo = Data.Value; //Editorble 데이터 SubSystem에서 할당.
 			SlotData->ItemMasterInfo = FItemMasterInfo();	
 		}
 		else

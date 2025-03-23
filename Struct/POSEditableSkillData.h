@@ -14,4 +14,7 @@ struct FEditableSkillData : public FTableRowBase
 public:
 	UPROPERTY(Category = "POS_Skill", EditAnywhere, BlueprintReadWrite)
 	int32 Level;
+
+	UPROPERTY(Category = "POS_Skill", EditAnywhere, BlueprintReadWrite)
+	int32 LevelProgress;
 };

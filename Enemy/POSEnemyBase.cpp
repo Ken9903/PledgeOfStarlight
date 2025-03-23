@@ -23,19 +23,30 @@ APOSEnemyBase::APOSEnemyBase()
 
 void APOSEnemyBase::TakeDamage(float Damage, float SoundDelay)
 {
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(
-	TimerHandle, // 타이머 핸들
-	this,        // 실행할 객체
-	&APOSEnemyBase::PlayHitSound, // 실행할 함수
-	SoundDelay,        // 실행까지 걸리는 시간 (초)
-	false        // 반복 여부 (false면 1회 실행, true면 반복 실행)
-);
+	if(SoundDelay == 0) //Timer Delay가 0이면 실행이 인됨.
+	{
+		PlayHitSound();
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(
+		TimerHandle, 
+		this,        
+		&APOSEnemyBase::PlayHitSound, 
+		SoundDelay,       
+		false);
+	}
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Take Damage : %.2f"), Damage));
 	}
 	return;
+}
+
+USceneComponent* APOSEnemyBase::GetHitPoint()
+{
+	return HitPoint;
 }
 
 void APOSEnemyBase::PlayHitSound()

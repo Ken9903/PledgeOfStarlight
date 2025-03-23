@@ -23,12 +23,13 @@ void APOSUtilityBasicMPHeal::BeginPlay()
 
 void APOSUtilityBasicMPHeal::UseSkill()
 {
+	Super::UseSkill();
 	MPHealNiagaraComponent->SetActive(true, true);
 	UGameplayStatics::PlaySound2D(this, UsingSound);
 
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("HP Heal : %f"), UtilitySkillData.MPHealAmount));
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("MP Heal : %f"), UtilitySkillData.MPHealAmount));
 	}
 	return;
 }

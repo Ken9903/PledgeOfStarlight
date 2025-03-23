@@ -19,6 +19,7 @@ public:
 	APOSUtilityBasicHPHeal();
 
 private:
+	UPROPERTY(Category = "POS_Effect", EditDefaultsOnly)
 	TObjectPtr<UNiagaraComponent> HPHealNiagaraComponent;
 	
 	virtual void BeginPlay() override;

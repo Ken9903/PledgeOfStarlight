@@ -12,13 +12,20 @@ void APOSAttackSkillBase::HitEvent(AActor* HitActor, float Damage, float Delay, 
 	{
 		EnemyInterface->TakeDamage(Damage, HitPreDelay);
 
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			FTimerDelegate::CreateUObject(this, &APOSAttackSkillBase::AppearHitFlash, HitLocation),
-			HitPreDelay,
-			false
-			);
+		if(HitPreDelay == 0) // 타이머 길이가 0이면 실행이 안됨.
+		{
+			AppearHitFlash(HitLocation);
+		}
+		else
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				TimerHandle,
+				FTimerDelegate::CreateUObject(this, &APOSAttackSkillBase::AppearHitFlash, HitLocation),
+				HitPreDelay,
+				false
+				);	
+		}
 	}
 	return;
 }

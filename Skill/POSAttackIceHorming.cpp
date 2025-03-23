@@ -2,9 +2,8 @@
 
 
 #include "POSAttackIceHorming.h"
-
-#include "AudioDevice.h"
 #include "Kismet/GameplayStatics.h"
+#include "PledgeOfStarlight/Interface/POSEnemyInterface.h"
 
 APOSAttackIceHorming::APOSAttackIceHorming()
 {
@@ -13,7 +12,7 @@ APOSAttackIceHorming::APOSAttackIceHorming()
 	
 	HitSearchArea = CreateDefaultSubobject<USphereComponent>(TEXT("HitSearchArea"));
 	HitSearchArea->SetupAttachment(RootSceneComponent);
-	HitSearchArea->SetSphereRadius(32.0f);
+	HitSearchArea->SetSphereRadius(3200.0f);
 
 	SkillID = ESkillID::Temp3;
 	AttachPosition = FVector3d(0, 0, 160);
@@ -24,16 +23,22 @@ void APOSAttackIceHorming::BeginPlay()
 	Super::BeginPlay();
 	HitSearchArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	InitTransform();
+
+	HitSearchArea->OnComponentBeginOverlap.AddDynamic(this, &APOSAttackIceHorming::OnHitSearchCollisionOverlap);
 	return;
 }
 
 void APOSAttackIceHorming::UseSkill()
 {
+	Super::UseSkill();
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(GetActorLocation());
 	SpawnTransform.SetRotation(GetActorRotation().Quaternion());
 	SpawnTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 	POSIceOrb = GetWorld()->SpawnActor<APOSIceOrb>(POSIceOrbClass, SpawnTransform);
+	//부가요소는 부모에서부터 할당.
+	POSIceOrb->SkillID = SkillID;
+	POSIceOrb->HitFlash = HitFlash;
 
 	UGameplayStatics::PlaySound2D(this, UsingSound);
 
@@ -56,5 +61,17 @@ void APOSAttackIceHorming::StartCollisionTrigger()
 void APOSAttackIceHorming::EndCollisionTrigger()
 {
 	HitSearchArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	return;
+}
+
+void APOSAttackIceHorming::OnHitSearchCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	IPOSEnemyInterface* POSEnemyInterface = Cast<IPOSEnemyInterface>(OtherActor);
+	if(POSEnemyInterface)
+	{
+		POSIceOrb->ProjectileMovementComponent->HomingTargetComponent = POSEnemyInterface->GetHitPoint();
+	}
+
 	return;
 }

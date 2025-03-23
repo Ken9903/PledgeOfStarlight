@@ -47,7 +47,8 @@ public:
 	void CreateInGamePresetPanel();
 
 private:
-	UPROPERTY(Category = "POS_Preset", EditAnywhere)
+	//MasterInfo를 가져오지만 클래스만 참조함. TODO : Editable같은 혼동을 일으키는 수치는 나중에 삭제 -> SubSystem에서 관리
+	UPROPERTY(Category = "POS_Preset", EditAnywhere, meta = (ToolTip = "클래스만 참조. Editable같은 수치는 삭제 예정, 수치관련 정보는 SubSystem에서 관리"))
 	TArray<FSlotData> PresetDataList;
 
 	UPROPERTY(Category = "POS_Preset", VisibleAnywhere)

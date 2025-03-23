@@ -42,7 +42,7 @@ void UPOSPlayerAbility::UsePreset(int32 InputNumber)
 			SkillSpawnPool[InputNumber] = SpawnedSkill;
 			ACharacter* POSPlayer = Cast<ACharacter>(GetOwner());
 			SpawnedSkill->AttachToComponent(POSPlayer->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), NAME_None);
-
+			
 			SpawnedSkill->UseSkill();
 		}
 		break;

@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "POSEnemyInterface.generated.h"
+#include "POSGimmickInteractInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UPOSEnemyInterface : public UInterface
+class UPOSGimmickInteractInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,15 +16,11 @@ class UPOSEnemyInterface : public UInterface
 /**
  * 
  */
-class PLEDGEOFSTARLIGHT_API IPOSEnemyInterface
+class PLEDGEOFSTARLIGHT_API IPOSGimmickInteractInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(Category = "POS_Enemy")
-	virtual void TakeDamage(float Damage, float SoundDelay) = 0;
-
-	UFUNCTION(Category = "POS_Enemy")
-	virtual USceneComponent* GetHitPoint() = 0;
+	virtual void InteractSkill(FName SkillID) = 0;
 };

@@ -18,7 +18,7 @@ class PLEDGEOFSTARLIGHT_API UPOSSaveGame : public USaveGame
 
 public:
 	UPROPERTY(Category = "POS_Save", EditDefaultsOnly)
-	TArray<FSkillMasterInfo> EarnedSkillDataList;
+	TMap<FName, FSkillMasterInfo> EarnedSkillDataList;
 
 	UPROPERTY(Category = "POS_Save", EditDefaultsOnly)
 	TArray<FSlotData> PresetDataList;

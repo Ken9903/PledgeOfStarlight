@@ -55,6 +55,11 @@ APledgeOfStarlightCharacter::APledgeOfStarlightCharacter()
 
 	PlayerAbility = CreateDefaultSubobject<UPOSPlayerAbility>(TEXT("PlayerAbility"));
 	PlayerInventory = CreateDefaultSubobject<UPOSPlayerInventory>(TEXT("PlayerInventory"));
+
+	SkillGimmickTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SkillGimmickTrigger"));
+	SkillGimmickTrigger->SetupAttachment(RootComponent);
+	SkillGimmickTrigger->SetSphereRadius(150.0f);
+	//SkillGimmickTrigger->SetCollisionProfileName(TEXT("")); // 추가 고려
 }
 
 UPOSPlayerAbility* APledgeOfStarlightCharacter::GetPlayerAbility()
@@ -67,10 +72,47 @@ UPOSPlayerInventory* APledgeOfStarlightCharacter::GetPlayerInventory()
 	return PlayerInventory;
 }
 
+UPOSNPCDialogueHighlightWidget* APledgeOfStarlightCharacter::GetNPCDialogueHighlightWidget()
+{
+	return NPCDialogueHighlightWidget;
+}
+
+void APledgeOfStarlightCharacter::SetNPCDialogueHighlightWidget(UPOSNPCDialogueHighlightWidget* InNPCDialogueHighlightWidget)
+{
+	NPCDialogueHighlightWidget = InNPCDialogueHighlightWidget;
+	return;
+}
+
 void APledgeOfStarlightCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	
+	SkillGimmickTrigger->OnComponentBeginOverlap.AddDynamic(this, &APledgeOfStarlightCharacter::OnSkillGimmickCollisionBeginOverlap);
+	SkillGimmickTrigger->OnComponentEndOverlap.AddDynamic(this, &APledgeOfStarlightCharacter::OnSkillGimmickCollisionEndOverlap);
+}
+
+void APledgeOfStarlightCharacter::OnSkillGimmickCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	IPOSGimmickInteractInterface* GimmickInteractInterface = Cast<IPOSGimmickInteractInterface>(OtherActor);
+	if(GimmickInteractInterface)
+	{
+		GimmickInteractObjectList.Emplace(GimmickInteractInterface);
+		UE_LOG(LogTemp, Log, TEXT("Gimmick Trigger In Count : %d"), GimmickInteractObjectList.Num());
+	}
+}
+
+void APledgeOfStarlightCharacter::OnSkillGimmickCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	IPOSGimmickInteractInterface* GimmickInteractInterface = Cast<IPOSGimmickInteractInterface>(OtherActor);
+	if(GimmickInteractInterface)
+	{
+		GimmickInteractObjectList.Remove(GimmickInteractInterface);
+		UE_LOG(LogTemp, Log, TEXT("Gimmick Trigger Out Count : %d"), GimmickInteractObjectList.Num());
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

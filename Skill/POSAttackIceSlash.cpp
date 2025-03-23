@@ -3,6 +3,7 @@
 
 #include "POSAttackIceSlash.h"
 #include "Kismet/GameplayStatics.h"
+#include "PledgeOfStarlight/Interface/POSEnemyInterface.h"
 
 APOSAttackIceSlash::APOSAttackIceSlash()
 {
@@ -34,8 +35,9 @@ void APOSAttackIceSlash::BeginPlay()
 	return;
 }
 
-void APOSAttackIceSlash::UseSkill()
+void APOSAttackIceSlash::UseSkill() // 각종 데이터 SubSystem에서 가져오기
 {
+	Super::UseSkill();
 	IceSlashEffect->SetActive(true, true);
 	UGameplayStatics::PlaySound2D(this, UsingSound);
 
@@ -70,7 +72,11 @@ void APOSAttackIceSlash::OffCollision()
 void APOSAttackIceSlash::OnAttackCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	HitEvent(OtherActor, SkillData.Damage, 0, OtherActor->GetActorLocation());
+	IPOSEnemyInterface* POSEnemyInterface = Cast<IPOSEnemyInterface>(OtherActor);
+	if(POSEnemyInterface)
+	{
+		HitEvent(OtherActor, SkillData.Damage, 0, POSEnemyInterface->GetHitPoint()->GetComponentLocation());
+	}
 	return;
 }
 

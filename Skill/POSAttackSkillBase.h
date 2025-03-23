@@ -11,11 +11,12 @@ UCLASS()
 class PLEDGEOFSTARLIGHT_API APOSAttackSkillBase : public APOSSkillBase
 {
 	GENERATED_BODY()
-
-protected:
+	
+public:
 	UPROPERTY(Category = "POS_Hit", EditDefaultsOnly)
 	UNiagaraSystem* HitFlash;
 
+protected:
 	UPROPERTY(Category = "POS_Hit", EditDefaultsOnly)
 	float HitPreDelay = 0.0f;
 

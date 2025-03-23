@@ -21,6 +21,7 @@ void APOSUtilityBasicHPHeal::BeginPlay()
 
 void APOSUtilityBasicHPHeal::UseSkill()
 {
+	Super::UseSkill();
 	HPHealNiagaraComponent->SetActive(true, true);
 	UGameplayStatics::PlaySound2D(this, UsingSound);
 

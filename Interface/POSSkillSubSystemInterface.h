@@ -27,5 +27,5 @@ public:
 	virtual FUtilitySkillData GetUtilitySkillDataFromTable(FName RowName) = 0;
 
 	UFUNCTION(Category = "POS_Skill")
-	virtual TArray<FSkillMasterInfo> GetEarnedSkillDataList() = 0;
+	virtual TMap<FName, FSkillMasterInfo> GetEarnedSkillDataList() = 0;
 };

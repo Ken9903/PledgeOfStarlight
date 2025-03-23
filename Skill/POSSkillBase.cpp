@@ -4,6 +4,8 @@
 #include "POSSkillBase.h"
 
 #include "POSSkillGameInstanceSubSystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "PledgeOfStarlight/PledgeOfStarlightCharacter.h"
 
 APOSSkillBase::APOSSkillBase()
 {
@@ -32,11 +34,8 @@ void APOSSkillBase::BeginPlay()
 
 void APOSSkillBase::UseSkill()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Use Default SKill"));
-	}
-	return;
+	// 스킬 기믹 발동, 정보 전달.
+	SendSkillIDToInteractGimmick();
 }
 
 void APOSSkillBase::InitTransform()
@@ -44,4 +43,13 @@ void APOSSkillBase::InitTransform()
 	SetActorRelativeLocation(AttachPosition);
 	SetActorRelativeRotation(AttachRotation);
 	return;
+}
+
+void APOSSkillBase::SendSkillIDToInteractGimmick()
+{
+	for (auto Element : Cast<APledgeOfStarlightCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))->GimmickInteractObjectList)
+	{
+		FString EnumName = UEnum::GetValueAsString(SkillID);
+		Element->InteractSkill(FName(EnumName.Replace(TEXT("ESkillID::"), TEXT(""))));
+	}
 }
